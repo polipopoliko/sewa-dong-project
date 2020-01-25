@@ -2,28 +2,40 @@ import 'package:flutter/material.dart';
 import 'package:sewa_dong_project/Model/car.dart';
 import 'package:sewa_dong_project/Utils/SessionUser.dart';
 import 'package:sewa_dong_project/Utils/snackbar.dart';
+import 'package:sewa_dong_project/invoice_page.dart';
 import 'package:sewa_dong_project/vehicle_detail.dart';
 
 class HomePage extends StatefulWidget {
+  final String message;
+
+  HomePage({this.message = ''});
+
   @override
   State<StatefulWidget> createState() {
     return HomePageState();
   }
 }
 
-class HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> with WidgetsBindingObserver {
   bool _isHomePage = true, _isSorted = false;
   List<Vehicle> _vehicleList = [];
   final GlobalKey<ScaffoldState> _scaffoldKey = GlobalKey<ScaffoldState>();
 
   @override
   void initState() {
+    print(widget.message);
+    WidgetsBinding.instance.addObserver(this);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (widget.message.length > 0)
+        Snackbar(scaffoldKey: _scaffoldKey, message: widget.message).showSnackbar();
+    });
     _initializeVehicle();
     super.initState();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -39,11 +51,69 @@ class HomePageState extends State<HomePage> {
           children: <Widget>[
             UserAccountsDrawerHeader(
               currentAccountPicture: Image.asset('images/account.png'),
-              accountEmail: Text(SessionUser.user.email),
-              accountName: Text(SessionUser.user.nama),
+              accountEmail: Text(SessionUser.user.nama),
+              accountName: Text('Coins: ${SessionUser.user.coin}'),
             ),
             ListTile(
-              leading: Icon(const IconData(59513, fontFamily: 'MaterialIcons')),
+              title: Text('Status Order'),
+              trailing: Icon(Icons.shopping_cart),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              title: Text('History'),
+              trailing: Icon(Icons.access_time),
+              onTap: () {
+                Navigator.pop(context);
+                Navigator.push(context, MaterialPageRoute(
+                  builder: (context) => InvoicePage()
+                ));
+              },
+            ),
+            ListTile(
+              title: Text('Rewards'),
+              trailing: Icon(Icons.redeem),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              title: Text('Rental with me'),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              title: Text('Setting'),
+              trailing: Icon(Icons.settings),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              title: Text('Help'),
+              trailing: Icon(Icons.help),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              title: Text('FAQ'),
+              trailing: Icon(Icons.live_help),
+              onTap: () {
+                Navigator.pop(context);
+                _featureNotAvailable();
+              },
+            ),
+            ListTile(
+              trailing:
+                  Icon(const IconData(59513, fontFamily: 'MaterialIcons')),
               title: Text('Logout'),
               onTap: () async {
                 await SessionUser.clearSession().whenComplete(() async {
@@ -111,7 +181,7 @@ class HomePageState extends State<HomePage> {
                                 context,
                                 MaterialPageRoute(
                                     builder: (context) =>
-                                        VehicleDetailPage(temp, _callbackFunction)))),
+                                        VehicleDetailPage(temp)))),
                       );
                     },
                   )
@@ -137,9 +207,6 @@ class HomePageState extends State<HomePage> {
       ),
     );
   }
-
-  void _callbackFunction(String message) =>
-      Snackbar(scaffoldKey: _scaffoldKey, message: message).showSnackbar();
 
   void _initializeVehicle() {
     Vehicle vec = Vehicle(
@@ -179,4 +246,10 @@ class HomePageState extends State<HomePage> {
         imagePath: 'images/city.jpg');
     _vehicleList.add(vec);
   }
+
+  void _featureNotAvailable() => Snackbar(
+          scaffoldKey: _scaffoldKey,
+          durationInSeconds: 1,
+          message: 'Fitur ini belum tersedia')
+      .showSnackbar();
 }

@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:sewa_dong_project/Model/car.dart';
+import 'package:sewa_dong_project/Model/ordered_items.dart';
 import 'package:sewa_dong_project/Utils/DefaultSpecification.dart';
+import 'package:sewa_dong_project/payment_page.dart';
 
 class VehicleDetailPage extends StatefulWidget {
   final Vehicle vec;
-  final Function callbackFunction;
 
-  VehicleDetailPage(this.vec, this.callbackFunction);
+  VehicleDetailPage(this.vec);
 
   @override
   State<StatefulWidget> createState() {
@@ -105,8 +106,7 @@ class VehicleDetailPageState extends State<VehicleDetailPage> {
               onPressed: () => showDialog(
                   context: context,
                   barrierDismissible: true,
-                  builder: (context) =>
-                      OrderDialog(widget.vec, widget.callbackFunction)),
+                  builder: (context) => OrderDialog(widget.vec)),
             )
           ],
         ),
@@ -117,9 +117,8 @@ class VehicleDetailPageState extends State<VehicleDetailPage> {
 
 class OrderDialog extends StatefulWidget {
   final Vehicle vec;
-  final Function callbackFunction;
 
-  OrderDialog(this.vec, this.callbackFunction);
+  OrderDialog(this.vec);
 
   @override
   State<StatefulWidget> createState() {
@@ -208,7 +207,10 @@ class OrderDialogState extends State<OrderDialog> {
                   ],
                 ),
               ),
-              Text('Tanggal Sewa', style: TextStyle(fontSize: 18)),
+              Text(
+                'Tanggal Sewa',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
               Row(
                 children: <Widget>[
                   Expanded(
@@ -305,16 +307,22 @@ class OrderDialogState extends State<OrderDialog> {
               Align(
                 alignment: Alignment.center,
                 child: RaisedButton(
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(5.0)),
-                  color: Colors.blue,
-                  child: Text('Bayar'),
-                  onPressed: () async {
-                    widget.callbackFunction('Order Succeeded');
-                    await Navigator.of(context).pushNamedAndRemoveUntil(
-                        '/home', (Route<dynamic> route) => false);
-                  },
-                ),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(5.0)),
+                    color: Colors.blue,
+                    child: Text('Bayar'),
+                    onPressed: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => PaymentPage(
+                                  orderedItems: OrderedItems(
+                                      vehicle: widget.vec,
+                                      start: _pickUp,
+                                      end: _return,),
+                                )),
+                      );
+                    }),
               )
             ],
           ),
