@@ -79,12 +79,12 @@ class InvoicePageState extends State<InvoicePage> {
 class InvoiceDetailPage extends StatelessWidget {
   final int id;
   final OrderedItems orderedItems;
-  int totalPrice = 0;
 
   InvoiceDetailPage({this.id, this.orderedItems});
 
   @override
   Widget build(BuildContext context) {
+    int totalPrice = 0;
     totalPrice = orderedItems.vehicle.price *
         (orderedItems.end.difference(orderedItems.start).inDays == 0
             ? 1
